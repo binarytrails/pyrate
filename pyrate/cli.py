@@ -1,9 +1,12 @@
+# @author dotPY-hax
+# @author Vsevolod Ivanov
+
 class CLI:
     def __init__(self):
-        self.prompt_text = ">"
+        self.prompt_text = '>'
 
     def cli_prompt(self):
-        prompt = input(self.prompt_text+">")
+        prompt = input(self.prompt_text + ' ')
         return prompt
 
     def cli_print(self, content):
