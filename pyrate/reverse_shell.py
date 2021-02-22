@@ -22,9 +22,11 @@ class ReverseShell:
         self.cli.cli_print(initial_data)
 
     def main_loop(self):
-        new_command = self.cli.cli_prompt()
-        new_command = self.handle_command(new_command)
-        self.run_command_and_print(new_command)
+        self.handle_initial_data()
+        while self.running:
+            new_command = self.cli.cli_prompt()
+            new_command = self.handle_command(new_command)
+            self.run_command_and_print(new_command)
 
     def run_command_and_print(self, command):
         return_value = self.listener.send_receive(command)
@@ -48,11 +50,6 @@ class ReverseShell:
             self.search_for_privesc()
             return ''
         return command + '\n'
-
-    def run(self):
-        self.handle_initial_data()
-        while self.running:
-            self.main_loop()
 
     def commands_from_local_file(self, local_file):
         with open(local_file, 'r') as run_this:

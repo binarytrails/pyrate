@@ -43,8 +43,13 @@ class Pyrate:
     def main_loop(self):
         print(__banner__ + 'select an action (h=help)')
         while self.running:
-            prompt = self.cli.cli_prompt()
-            self.handle_command(prompt)
+            try:
+                prompt = self.cli.cli_prompt()
+                self.handle_command(prompt)
+            except KeyboardInterrupt as e:
+                key = input(' do you want to quit (y)? ')
+                if (key == 'y'):
+                    break
 
     def handle_command(self, prompt):
         p = prompt.lower()
@@ -58,8 +63,26 @@ class Pyrate:
             print('actions: [r]everse, [n]map, [h]elp, [q]uit')
 
     def start_reverse_shell(self):
-        r = ReverseShell(self.lhost, self.lport, self.thost)
-        r.run()
+        stop = False
+        while not stop:
+            rshell = None
+            try:
+                rshell = ReverseShell(self.lhost, self.lport, self.thost)
+                rshell.main_loop()
+            except KeyboardInterrupt as e:
+                key = input(' do you want to stop (y)? ')
+                if (key == 'y'):
+                    stop = True
+            except BrokenPipeError as e:
+                print(e)
+            except ConnectionResetError as e:
+                print(e)
+            except OSError as e:
+                print(e)
+            if (rshell):
+                del rshell
+            if (not stop):
+                print('restarting reverse shell..')
 
     def start_nmap_wrap(self):
         nmap_wrap = NmapWrap(self.thost)
