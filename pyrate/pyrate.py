@@ -38,7 +38,7 @@ class Pyrate:
 
         self.lhost = lhost
         self.lport = lport
-        self.thost = rhost
+        self.rhost = rhost
 
     def main_loop(self):
         print(__banner__ + 'select an action (h=help)')
@@ -67,7 +67,7 @@ class Pyrate:
         while not stop:
             rshell = None
             try:
-                rshell = ReverseShell(self.lhost, self.lport, self.thost)
+                rshell = ReverseShell(self.lhost, self.lport, self.rhost)
                 rshell.main_loop()
             except KeyboardInterrupt as e:
                 key = input(' do you want to stop (y)? ')
@@ -85,5 +85,5 @@ class Pyrate:
                 print('restarting reverse shell..')
 
     def start_nmap_wrap(self):
-        nmap_wrap = NmapWrap(self.thost)
+        nmap_wrap = NmapWrap(self.rhost)
         nmap_wrap.run()
