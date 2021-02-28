@@ -4,10 +4,10 @@
 import os
 
 class NmapWrap:
-    def __init__(self, target_ip):
+    def __init__(self, rhost):
         self.nmap_command = 'nmap -sC -sV -oG /tmp/nmapscan {ip}'
-        self.target_ip = target_ip
+        self.rhost = rhost
 
     def run(self):
-        command = self.nmap_command.format(ip=self.target_ip)
+        command = self.nmap_command.format(ip=self.rhost)
         os.system(command)

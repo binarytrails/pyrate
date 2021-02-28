@@ -5,13 +5,13 @@ import select
 import socket
 
 class PortFileTransfer:
-    def __init__(self, host_ip, port_number, target_ip):
+    def __init__(self, lhost, port_number, rhost):
         self.port = port_number
         self.socket = socket.socket()
-        self.target_ip = target_ip
+        self.rhost = rhost
         self.connection = None
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((host_ip, port_number))
+        self.socket.bind((lhost, port_number))
 
     def receive_data(self):
         byte_data = b''
@@ -24,15 +24,15 @@ class PortFileTransfer:
         self.connection.sendall(data_to_send)
 
     def connect(self):
-        self.socket.connect((self.target_ip, self.port))
+        self.socket.connect((self.rhost, self.port))
         self.socket.setblocking(False)
 
     def get_connected(self):
         self.socket.listen(5)
         self.connection, address = self.socket.accept()
-        self.target_ip = address[0]
+        self.rhost = address[0]
         self.socket.setblocking(False)
-        print('Connection to {} established'.format(self.target_ip))
+        print('Connection to {} established'.format(self.rhost))
 
     def close(self):
         self.socket.close()

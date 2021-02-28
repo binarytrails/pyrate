@@ -5,11 +5,11 @@ import socket
 import select
 
 class PortListener:
-    def __init__(self, host_ip, port_number):
+    def __init__(self, lhost, port_number):
         self.port = port_number
         self.socket = socket.socket()
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((host_ip, port_number))
+        self.socket.bind((lhost, port_number))
         self._listen()
         self._accept()
         self.socket.setblocking(False)
@@ -23,8 +23,8 @@ class PortListener:
 
     def _accept(self):
         self.connection, address = self.socket.accept()
-        self.target_ip = address[0]
-        print('Connection to {} established'.format(self.target_ip))
+        self.rhost = address[0]
+        print('Connection to {} established'.format(self.rhost))
 
     def receive_data(self):
         byte_data = b''

