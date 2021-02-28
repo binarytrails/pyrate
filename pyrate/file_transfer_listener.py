@@ -5,18 +5,22 @@ import select
 import socket
 
 class PortFileTransfer:
-    def __init__(self, lhost, port_number, rhost):
-        self.port = port_number
+    def __init__(self, lhost, lport, rhost):
+        self.port = lport
         self.socket = socket.socket()
         self.rhost = rhost
         self.connection = None
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((lhost, port_number))
+        print('[portfiletransfer] bind {}:{}'.format(lhost, lport))
+        self.socket.bind((lhost, lport))
+        print('[portfiletransfer] binded')
 
     def receive_data(self):
         byte_data = b''
         while select.select([self.connection], [], [], 1)[0]:
             received = self.connection.recv(1)
+            if (received.decode()):
+                print(received)
             byte_data += received
         return byte_data
 
@@ -29,7 +33,9 @@ class PortFileTransfer:
 
     def get_connected(self):
         self.socket.listen(5)
+        print('[portfiletransfer] listening')
         self.connection, address = self.socket.accept()
+        print('[portfiletransfer] accepted')
         self.rhost = address[0]
         self.socket.setblocking(False)
         print('Connection to {} established'.format(self.rhost))

