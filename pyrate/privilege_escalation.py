@@ -19,5 +19,5 @@ class PrivilegeEscalation:
         result = self._run_and_get_result(command)
 
     def search_for_privesc(self):
-        self.look_for_sudo()
         self.look_for_suid()
+        self.look_for_sudo() # TODO fix passwd request & skip

