@@ -1,1 +1,1 @@
-python -m pyrate $@
+python3 -m pyrate $@
